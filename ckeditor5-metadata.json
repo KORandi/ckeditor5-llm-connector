@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    {
+      "name": "Llm connector",
+      "className": "LlmConnector",
+      "description": "Adds text to the editor.",
+      "path": "src/llmconnector.ts",
+      "uiComponents": [
+        {
+          "name": "llmConnectorButton",
+          "type": "Button",
+          "iconPath": "theme/icons/ckeditor.svg"
+        }
+      ]
+    }
+  ]
+}
