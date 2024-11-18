@@ -27,6 +27,7 @@ import {
 	Paragraph,
 	Table,
 	TableToolbar,
+	Editor,
 } from 'ckeditor5';
 
 import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
@@ -35,6 +36,8 @@ import { GhostText } from '@thesis/ckeditor5-ghost-text';
 
 import 'ckeditor5/ckeditor5.css';
 import '@thesis/ckeditor5-ghost-text/index.css';
+import { chatGPTConnector } from './chatgpt-connector';
+import { llamaConnector } from './llama-connector';
 
 ClassicEditor.create(document.getElementById('editor')!, {
 	plugins: [
@@ -84,6 +87,7 @@ ClassicEditor.create(document.getElementById('editor')!, {
 		'insertTable',
 		'mediaEmbed',
 		'codeBlock',
+		'logPlainTextWithCursor',
 	],
 	image: {
 		toolbar: [
@@ -98,14 +102,8 @@ ClassicEditor.create(document.getElementById('editor')!, {
 		contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
 	},
 	ghostText: {
-		debounceDelay: 1000,
-		contentFetcher: async () => {
-			return new Promise((resolve) =>
-				setTimeout(() => {
-					resolve('I need a dollar');
-				}, 2000)
-			);
-		},
+		debounceDelay: 300,
+		contentFetcher: llamaConnector,
 	},
 })
 	.then((editor) => {
