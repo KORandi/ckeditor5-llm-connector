@@ -3,304 +3,160 @@ import {
 	Dialog,
 	View,
 	Plugin,
-	LabeledFieldView,
-	createLabeledInputText,
-	submitHandler,
-	FocusTracker,
-	KeystrokeHandler,
-	InputTextView,
+	Locale,
+	LocaleTranslate,
 } from 'ckeditor5';
+import { ParameterFormView } from './paremeter-form-view';
 
-// Create a plugin that provides a dialog for parameter configuration.
 export default class ParameterConfigDialog extends Plugin {
-	get requires() {
+	static get requires(): Array<typeof Plugin> {
 		return [Dialog];
 	}
 
-	init() {
+	init(): void {
+		this._addParameterConfigButton();
+	}
+
+	/**
+	 * Adds a parameter configuration button to the editor's component factory.
+	 */
+	private _addParameterConfigButton(): void {
 		const t = this.editor.locale.t;
-		// Add a button to the component factory so it is available for the editor.
+
 		this.editor.ui.componentFactory.add('parameterConfig', (locale) => {
-			const buttonView = new ButtonView(locale);
+			const buttonView = this._createButtonView(locale, t);
 
-			buttonView.set({
-				label: 'Show a modal',
-				tooltip: true,
-				withText: true,
-			});
-
-			// Define the button behavior on press.
-			buttonView.on('execute', () => {
-				const dialog = this.editor.plugins.get('Dialog');
-
-				// If the button is turned on, hide the modal.
-				if (buttonView.isOn) {
-					dialog.hide();
-					buttonView.isOn = false;
-
-					return;
-				}
-
-				buttonView.isOn = true;
-
-				// Otherwise, show the modal.
-				// First, create a view with some simple content. It will be displayed as the dialog's body.
-				const textView = new View(locale);
-
-				const formView = new ParameterFormView(locale);
-
-				textView.setTemplate({
-					tag: 'div',
-					attributes: {
-						style: {
-							padding: 'var(--ck-spacing-large)',
-							whiteSpace: 'initial',
-							width: '100%',
-							maxWidth: '500px',
-						},
-						tabindex: -1,
-					},
-					children: [formView],
-				});
-
-				// Tell the plugin to display a modal with the title, content, and one action button.
-				dialog.show({
-					isModal: true,
-					title: 'Configure Parameters',
-					content: textView,
-					actionButtons: [
-						{
-							label: t('Cancel'),
-							withText: true,
-							onExecute: () => dialog.hide(),
-						},
-						{
-							label: t('Accept'),
-							class: 'ck-button-action',
-							withText: true,
-							onExecute: () => dialog.hide(),
-						},
-					],
-					onHide() {
-						buttonView.isOn = false;
-					},
-					id: 'abc',
-				});
-			});
+			// Define behavior for button execution.
+			buttonView.on('execute', () =>
+				this._handleButtonExecute(buttonView)
+			);
 
 			return buttonView;
 		});
 	}
-}
 
-export class ParameterFormView extends View {
-	focusTracker: FocusTracker;
-	keystrokes: KeystrokeHandler;
-	accuracySwitchView: View<HTMLElement>;
-	frequencyRadioGroupView: View<HTMLElement>;
-	metadataInputView: LabeledFieldView<InputTextView>;
-	frequency: string;
-	metadata: string;
-	accuracy: number;
+	/**
+	 * Creates the button view with the necessary properties.
+	 * @param locale - The editor's locale.
+	 * @param t - The translation function.
+	 * @returns The configured button view.
+	 */
+	private _createButtonView(locale: Locale, t: LocaleTranslate): ButtonView {
+		const buttonView = new ButtonView(locale);
 
-	constructor(locale) {
-		super(locale);
+		buttonView.set({
+			label: t('Show a modal'),
+			tooltip: true,
+			withText: true,
+			isOn: false, // Initialize button state
+		});
 
-		this.focusTracker = new FocusTracker();
-		this.keystrokes = new KeystrokeHandler();
+		return buttonView;
+	}
 
-		this.set('accuracy', 0);
-		this.set('frequency', 'onKeyPress');
-		this.set('metadata', '');
+	/**
+	 * Handles the button execution logic.
+	 * @param buttonView - The button view instance.
+	 */
+	private _handleButtonExecute(buttonView: ButtonView): void {
+		const dialog = this.editor.plugins.get('Dialog');
 
-		this.accuracySwitchView = this._createAccuracySlider();
-		this.frequencyRadioGroupView = this._createFrequencyRadioGroup();
-		this.metadataInputView = this._createMetadataInput();
+		if (buttonView.isOn) {
+			this._hideDialog(dialog, buttonView);
+		} else {
+			this._showDialog(dialog, buttonView);
+		}
+	}
 
-		this.setTemplate({
-			tag: 'form',
-			attributes: {
-				style: {
-					display: 'flex',
-					flexDirection: 'column',
-					gap: '16px',
-				},
-				class: ['ck', 'ck-parameter-form', 'ck-responsive-form'],
-				tabindex: '-1',
+	/**
+	 * Hides the dialog and updates the button state.
+	 * @param dialog - The dialog plugin instance.
+	 * @param buttonView - The button view instance.
+	 */
+	private _hideDialog(dialog: Dialog, buttonView: ButtonView): void {
+		dialog.hide();
+		buttonView.isOn = false;
+	}
+
+	/**
+	 * Shows the dialog with the parameter configuration form.
+	 * @param dialog - The dialog plugin instance.
+	 * @param buttonView - The button view instance.
+	 */
+	private _showDialog(dialog: Dialog, buttonView: ButtonView): void {
+		const locale = this.editor.locale;
+
+		buttonView.isOn = true;
+
+		const formView = new ParameterFormView(locale);
+		const contentView = this._createDialogContentView(locale, formView);
+
+		dialog.show({
+			isModal: true,
+			title: locale.t('Configure Parameters'),
+			content: contentView,
+			actionButtons: this._createDialogActionButtons(dialog),
+			onHide: () => {
+				buttonView.isOn = false;
 			},
-			children: [
-				this.accuracySwitchView,
-				this.frequencyRadioGroupView,
-				this.metadataInputView,
-			],
+			id: 'parameterConfigDialog',
 		});
 	}
 
-	render() {
-		super.render();
+	/**
+	 * Creates the dialog's content view with the parameter form.
+	 * @param locale - The editor's locale.
+	 * @param formView - The parameter form view.
+	 * @returns The configured content view.
+	 */
+	private _createDialogContentView(locale: Locale, formView: View): View {
+		const contentView = new View(locale);
 
-		submitHandler({ view: this });
-
-		this.focusTracker.add(this.accuracySwitchView.element);
-		this.focusTracker.add(this.frequencyRadioGroupView.element);
-		this.focusTracker.add(this.metadataInputView.element);
-
-		this.keystrokes.listenTo(this.element);
-	}
-
-	destroy() {
-		super.destroy();
-		this.focusTracker.destroy();
-		this.keystrokes.destroy();
-	}
-
-	focus() {
-		this.metadataInputView.focus();
-	}
-
-	_createAccuracySlider() {
-		const container = new View(this.locale);
-
-		const sliderView = new View(this.locale);
-		sliderView.setTemplate({
-			tag: 'input',
-			attributes: {
-				type: 'range',
-				min: '0',
-				max: '100',
-				step: '1',
-				class: 'ck-slider',
-				value: this.bindTemplate.to('accuracy'),
-			},
-		});
-
-		sliderView.on('render', () => {
-			sliderView.element.addEventListener('input', (event) => {
-				const target = event.target as HTMLInputElement;
-				if (target) {
-					this.set('accuracy', parseInt(target.value, 10));
-				}
-			});
-		});
-
-		const labelView = new View(this.locale);
-		labelView.setTemplate({
-			tag: 'label',
-			children: ['Accuracy'],
-		});
-
-		const displayValue = new View(this.locale);
-		displayValue.setTemplate({
-			tag: 'span',
-			attributes: {
-				style: {
-					marginLeft: '8px',
-					fontSize: '14px',
-					fontWeight: 'bold',
-				},
-			},
-			children: [
-				{
-					text: this.bindTemplate.to(
-						'accuracy',
-						(value) => `${value}%`
-					),
-				},
-			],
-		});
-
-		container.setTemplate({
+		contentView.setTemplate({
 			tag: 'div',
 			attributes: {
 				style: {
-					display: 'flex',
-					flexDirection: 'column',
-					padding: '0 10px',
+					padding: 'var(--ck-spacing-large)',
+					whiteSpace: 'initial',
+					width: '100%',
+					maxWidth: '500px',
+				},
+				tabindex: -1,
+			},
+			children: [formView],
+		});
+
+		return contentView;
+	}
+
+	/**
+	 * Creates the action buttons for the dialog.
+	 * @param dialog - The dialog plugin instance.
+	 * @returns An array of action button configurations.
+	 */
+	private _createDialogActionButtons(dialog: Dialog): Array<{
+		label: string;
+		withText: boolean;
+		class?: string;
+		onExecute: () => void;
+	}> {
+		const t = this.editor.locale.t;
+
+		return [
+			{
+				label: t('Cancel'),
+				withText: true,
+				onExecute: () => dialog.hide(),
+			},
+			{
+				label: t('Accept'),
+				class: 'ck-button-action',
+				withText: true,
+				onExecute: () => {
+					// Logic for accepting changes can be added here.
+					dialog.hide();
 				},
 			},
-			children: [
-				labelView,
-				{
-					tag: 'div',
-					attributes: {
-						style: {
-							display: 'flex',
-							alignItems: 'center',
-							gap: '10px',
-						},
-					},
-					children: [sliderView, displayValue],
-				},
-			],
-		});
-
-		return container;
-	}
-
-	_createFrequencyRadioGroup() {
-		const fieldsetView = new View(this.locale);
-
-		fieldsetView.setTemplate({
-			tag: 'fieldset',
-			attributes: { class: 'ck-frequency-fieldset' },
-			children: [
-				{ tag: 'legend', children: ['Frequency'] },
-				...['onKeyPress', 'onWordComplete', 'onSentenceComplete'].map(
-					(value) => {
-						const labelView = new View(this.locale);
-						const inputView = new View(this.locale);
-
-						inputView.setTemplate({
-							tag: 'input',
-							attributes: {
-								type: 'radio',
-								name: 'frequency',
-								value,
-								checked: value === this.frequency,
-							},
-						});
-
-						labelView.setTemplate({
-							tag: 'label',
-							attributes: {
-								style: {
-									display: 'flex',
-									alignItems: 'center',
-									gap: '8px',
-								},
-							},
-							children: [
-								inputView,
-								value.replace(/([A-Z])/g, ' $1').trim(),
-							],
-						});
-
-						labelView.on('change', () => {
-							this.set('frequency', value);
-						});
-
-						return labelView;
-					}
-				),
-			],
-		});
-
-		return fieldsetView;
-	}
-
-	_createMetadataInput() {
-		const labeledInput = new LabeledFieldView(
-			this.locale,
-			createLabeledInputText
-		);
-
-		labeledInput.label = 'Metadata';
-		labeledInput.fieldView.value = this.metadata;
-
-		labeledInput.fieldView.on('input', () => {
-			this.set('metadata', labeledInput.fieldView.element.value.trim());
-		});
-
-		return labeledInput;
+		];
 	}
 }
