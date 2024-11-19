@@ -1,0 +1,27 @@
+/* .ck-media-form {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	padding: 20px;
+}
+
+.ck-frequency-fieldset {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	border: 1px solid #ccc;
+	padding: 12px;
+	border-radius: 4px;
+}
+
+.ck-frequency-fieldset legend {
+	font-weight: bold;
+}
+
+.ck-media-form textarea {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	resize: vertical;
+} */

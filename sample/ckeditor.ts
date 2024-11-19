@@ -36,8 +36,10 @@ import { GhostText } from '@thesis/ckeditor5-ghost-text';
 
 import 'ckeditor5/ckeditor5.css';
 import '@thesis/ckeditor5-ghost-text/index.css';
+import './style.css';
 import { chatGPTConnector } from './chatgpt-connector';
 import { llamaConnector } from './llama-connector';
+import ParameterConfigDialog from '../src/parameter-config-complete';
 
 ClassicEditor.create(document.getElementById('editor')!, {
 	plugins: [
@@ -63,6 +65,7 @@ ClassicEditor.create(document.getElementById('editor')!, {
 		CodeBlock,
 		Code,
 		Base64UploadAdapter,
+		ParameterConfigDialog,
 	],
 	toolbar: [
 		'undo',
@@ -88,6 +91,7 @@ ClassicEditor.create(document.getElementById('editor')!, {
 		'mediaEmbed',
 		'codeBlock',
 		'logPlainTextWithCursor',
+		'parameterConfig',
 	],
 	image: {
 		toolbar: [
