@@ -1,7 +1,7 @@
-import type { LlmConnector } from './index';
+import type ParameterConfigUI from './parameter-config-ui';
 
 declare module '@ckeditor/ckeditor5-core' {
 	interface PluginsMap {
-		[LlmConnector.pluginName]: LlmConnector;
+		[ParameterConfigUI.pluginName]: ParameterConfigUI;
 	}
 }

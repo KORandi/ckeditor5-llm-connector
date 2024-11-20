@@ -27,7 +27,6 @@ import {
 	Paragraph,
 	Table,
 	TableToolbar,
-	Editor,
 } from 'ckeditor5';
 
 import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
@@ -37,9 +36,8 @@ import { GhostText } from '@thesis/ckeditor5-ghost-text';
 import 'ckeditor5/ckeditor5.css';
 import '@thesis/ckeditor5-ghost-text/index.css';
 import './style.css';
-import { chatGPTConnector } from './chatgpt-connector';
 import { llamaConnector } from './llama-connector';
-import ParameterConfigDialog from '../src/parameter-config-complete';
+import { LLMConnector } from '../src';
 
 ClassicEditor.create(document.getElementById('editor')!, {
 	plugins: [
@@ -65,7 +63,7 @@ ClassicEditor.create(document.getElementById('editor')!, {
 		CodeBlock,
 		Code,
 		Base64UploadAdapter,
-		ParameterConfigDialog,
+		LLMConnector,
 	],
 	toolbar: [
 		'undo',
@@ -107,7 +105,7 @@ ClassicEditor.create(document.getElementById('editor')!, {
 	},
 	ghostText: {
 		debounceDelay: 300,
-		contentFetcher: llamaConnector,
+		contentFetcher: llamaConnector(),
 	},
 })
 	.then((editor) => {

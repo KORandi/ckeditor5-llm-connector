@@ -8,7 +8,11 @@ import {
 } from 'ckeditor5';
 import { ParameterFormView } from './paremeter-form-view';
 
-export default class ParameterConfigDialog extends Plugin {
+export default class ParameterConfigUI extends Plugin {
+	public static get pluginName() {
+		return 'ParameterConfigUI' as const;
+	}
+
 	static get requires(): Array<typeof Plugin> {
 		return [Dialog];
 	}
@@ -95,7 +99,7 @@ export default class ParameterConfigDialog extends Plugin {
 			isModal: true,
 			title: locale.t('Configure Parameters'),
 			content: contentView,
-			actionButtons: this._createDialogActionButtons(dialog),
+			actionButtons: this._createDialogActionButtons(dialog, formView),
 			onHide: () => {
 				buttonView.isOn = false;
 			},
@@ -134,7 +138,10 @@ export default class ParameterConfigDialog extends Plugin {
 	 * @param dialog - The dialog plugin instance.
 	 * @returns An array of action button configurations.
 	 */
-	private _createDialogActionButtons(dialog: Dialog): Array<{
+	private _createDialogActionButtons(
+		dialog: Dialog,
+		formView: ParameterFormView
+	): Array<{
 		label: string;
 		withText: boolean;
 		class?: string;
@@ -153,7 +160,8 @@ export default class ParameterConfigDialog extends Plugin {
 				class: 'ck-button-action',
 				withText: true,
 				onExecute: () => {
-					// Logic for accepting changes can be added here.
+					const formData = formView.getData();
+					this.editor.fire('parameterConfig:submit', formData);
 					dialog.hide();
 				},
 			},

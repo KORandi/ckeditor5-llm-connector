@@ -54,9 +54,18 @@ export class ParameterFormView extends View {
 		});
 	}
 
+	public getData() {
+		const { frequency, metadata, accuracy } = this;
+		return {
+			frequency,
+			metadata,
+			accuracy,
+		};
+	}
+
 	private setDefaults(): void {
 		this.set('accuracy', 80);
-		this.set('frequency', 'onKeyPress');
+		this.set('frequency', 'onWordComplete');
 		this.set('metadata', '');
 	}
 
@@ -147,7 +156,7 @@ export class ParameterFormView extends View {
 
 		// Update accuracy on input
 		slider.on('render', () => {
-			slider.element!.addEventListener('input', (event: Event) => {
+			slider.element.addEventListener('input', (event: Event) => {
 				const target = event.target as HTMLInputElement;
 				this.set('accuracy', parseInt(target.value, 10));
 			});
@@ -193,7 +202,12 @@ export class ParameterFormView extends View {
 	private createFrequencyRadioGroupView(): View<HTMLElement> {
 		const fieldset = new View(this.locale);
 
-		const options = ['onKeyPress', 'onWordComplete', 'onSentenceComplete'];
+		const options = [
+			'disabled',
+			'onKeyPress',
+			'onWordComplete',
+			'onSentenceComplete',
+		];
 		fieldset.setTemplate({
 			tag: 'fieldset',
 			attributes: { class: 'ck-frequency-fieldset' },
@@ -240,7 +254,11 @@ export class ParameterFormView extends View {
 			],
 		});
 
-		labelView.on('change', () => this.set('frequency', value));
+		inputView.on('render', () => {
+			inputView.element.addEventListener('change', () => {
+				this.set('frequency', value);
+			});
+		});
 
 		return labelView;
 	}
