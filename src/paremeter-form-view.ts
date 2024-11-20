@@ -6,10 +6,8 @@ import {
 	FocusTracker,
 	KeystrokeHandler,
 	InputTextView,
+	Locale,
 } from 'ckeditor5';
-
-// Define types for better readability and maintainability
-type Locale = any; // Replace `any` with the actual type if available
 
 export class ParameterFormView extends View {
 	focusTracker: FocusTracker;

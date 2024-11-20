@@ -8,15 +8,7 @@ import {
 } from 'ckeditor5';
 import { ParameterFormView } from './paremeter-form-view';
 
-export default class ParameterConfigUI extends Plugin {
-	public static get pluginName() {
-		return 'ParameterConfigUI' as const;
-	}
-
-	static get requires(): Array<typeof Plugin> {
-		return [Dialog];
-	}
-
+export default class LlmConnectorParameterConfigUI extends Plugin {
 	init(): void {
 		this._addParameterConfigButton();
 	}

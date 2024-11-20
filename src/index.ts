@@ -1,2 +1,5 @@
-export { default as LLMConnector } from './llm-conector.js';
-export * from './utils.js';
+import './interfaces/frequency';
+import './augmentation';
+import './utils';
+
+export { default as LLMConnector } from './llm-conector';
