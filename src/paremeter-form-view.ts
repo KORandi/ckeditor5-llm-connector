@@ -15,9 +15,9 @@ export class ParameterFormView extends View {
 	accuracySwitchView: View<HTMLElement>;
 	frequencyRadioGroupView: View<HTMLElement>;
 	metadataInputView: LabeledFieldView<InputTextView>;
-	frequency: string;
-	metadata: string;
-	accuracy: number;
+	public declare frequency: string;
+	public declare metadata: string;
+	public declare accuracy: number;
 
 	constructor(locale: Locale) {
 		super(locale);
