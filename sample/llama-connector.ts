@@ -4,7 +4,7 @@ import { Frequency } from '../src/interfaces/frequency';
 
 export const llamaConnector = () => {
 	let accuracy = 80;
-	let frequency: Frequency = 'onKeyPress';
+	let frequency: Frequency = 'onWordComplete';
 	let metadata = '';
 
 	window.addEventListener('load', () => {
@@ -25,32 +25,32 @@ export const llamaConnector = () => {
 		);
 	});
 
-	return async ({ editor, signal }: ContentFetcherProps) => {
+	return async ({ editor, signal }: ContentFetcherProps): Promise<string> => {
 		const content: string = getPlainText(editor.model.document.getRoot());
 
 		switch (frequency) {
 			case 'disabled':
-				return;
+				return '';
 			case 'onKeyPress':
 				if (!content.includes('[[cursor]]')) {
-					return;
+					return '';
 				}
 				break;
 			case 'onWordComplete':
 				// any letter + space + cursor
-				const regexWord = /\p{L}\s\[\[cursor\]\]/u;
+				const regexWord = /\p{L}\s\[\[cursor\]\]|\n\[\[cursor\]\]/u;
 				if (!regexWord.test(content)) {
-					return;
+					return '';
 				}
 				break;
 			case 'onSentenceComplete':
 				const regexSentence = /[\!\.\?]\s\[\[cursor\]\]/g;
 				if (!regexSentence.test(content)) {
-					return;
+					return '';
 				}
 				break;
 			default:
-				return;
+				return '';
 		}
 
 		const text = `${content}`;

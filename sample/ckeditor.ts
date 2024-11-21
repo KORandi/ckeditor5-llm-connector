@@ -104,7 +104,7 @@ ClassicEditor.create(document.getElementById('editor')!, {
 		contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
 	},
 	ghostText: {
-		debounceDelay: 300,
+		debounceDelay: 400,
 		contentFetcher: llamaConnector(),
 	},
 })
