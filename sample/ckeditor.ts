@@ -103,6 +103,11 @@ ClassicEditor.create(document.getElementById('editor')!, {
 	table: {
 		contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
 	},
+	llmConnector: {
+		onParameterSubmit(data) {
+			console.log('Receiving data:', data);
+		},
+	},
 	ghostText: {
 		debounceDelay: 400,
 		contentFetcher: llamaConnector(),

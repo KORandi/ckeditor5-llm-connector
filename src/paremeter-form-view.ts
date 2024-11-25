@@ -8,24 +8,26 @@ import {
 	InputTextView,
 	Locale,
 } from 'ckeditor5';
+import { LlmConnectorData } from './interfaces/llm-connector-data';
+import { Frequency } from './interfaces/frequency';
 
 export class ParameterFormView extends View {
 	focusTracker: FocusTracker;
 	keystrokes: KeystrokeHandler;
 	accuracySwitchView: View<HTMLElement>;
 	frequencyRadioGroupView: View<HTMLElement>;
-	metadataInputView: LabeledFieldView<InputTextView>;
-	public declare frequency: string;
+	metadataInputView: View<HTMLElement>;
+	public declare frequency: Frequency;
 	public declare metadata: string;
 	public declare accuracy: number;
 
-	constructor(locale: Locale) {
+	constructor(locale: Locale, formData: LlmConnectorData) {
 		super(locale);
 
 		// Initialize properties
 		this.focusTracker = new FocusTracker();
 		this.keystrokes = new KeystrokeHandler();
-		this.setDefaults();
+		this.setDefaults(formData);
 
 		// Initialize sub-views
 		this.accuracySwitchView = this.createAccuracySliderView();
@@ -52,7 +54,7 @@ export class ParameterFormView extends View {
 		});
 	}
 
-	public getData() {
+	public getData(): LlmConnectorData {
 		const { frequency, metadata, accuracy } = this;
 		return {
 			frequency,
@@ -61,10 +63,10 @@ export class ParameterFormView extends View {
 		};
 	}
 
-	private setDefaults(): void {
-		this.set('accuracy', 80);
-		this.set('frequency', 'onWordComplete');
-		this.set('metadata', '');
+	private setDefaults(formData: LlmConnectorData): void {
+		this.set('accuracy', formData.accuracy);
+		this.set('frequency', formData.frequency);
+		this.set('metadata', formData.metadata);
 	}
 
 	render(): void {
@@ -94,7 +96,7 @@ export class ParameterFormView extends View {
 	}
 
 	focus(): void {
-		this.metadataInputView.focus();
+		this.metadataInputView.element.querySelector('textarea').focus();
 	}
 
 	// Create the accuracy slider view
@@ -200,7 +202,7 @@ export class ParameterFormView extends View {
 	private createFrequencyRadioGroupView(): View<HTMLElement> {
 		const fieldset = new View(this.locale);
 
-		const options = [
+		const options: Frequency[] = [
 			'disabled',
 			'onKeyPress',
 			'onWordComplete',
@@ -220,7 +222,7 @@ export class ParameterFormView extends View {
 		return fieldset;
 	}
 
-	private createFrequencyRadioOption(value: string): View<HTMLElement> {
+	private createFrequencyRadioOption(value: Frequency): View<HTMLElement> {
 		const labelView = new View(this.locale);
 		const inputView = new View(this.locale);
 
@@ -262,19 +264,54 @@ export class ParameterFormView extends View {
 	}
 
 	// Create the metadata input view
-	private createMetadataInputView(): LabeledFieldView<InputTextView> {
-		const labeledInput = new LabeledFieldView(
-			this.locale,
-			createLabeledInputText
-		);
+	private createMetadataInputView(): View<HTMLElement> {
+		const textarea = new View(this.locale);
 
-		labeledInput.label = 'Metadata';
-		labeledInput.fieldView.value = this.metadata;
-
-		labeledInput.fieldView.on('input', () => {
-			this.set('metadata', labeledInput.fieldView.element!.value.trim());
+		const options = [
+			'disabled',
+			'onKeyPress',
+			'onWordComplete',
+			'onSentenceComplete',
+		];
+		textarea.setTemplate({
+			tag: 'div',
+			attributes: { class: 'flex flex-col' },
+			children: [
+				{
+					tag: 'label',
+					children: 'Metadata',
+				},
+				{
+					tag: 'textarea',
+					attributes: {
+						value: this.bindTemplate.to('metadata'),
+						style: {
+							display: 'block',
+							padding: '10px',
+							width: '100%',
+							fontSize: '0.875rem',
+							color: '#1f2937',
+							backgroundColor: '#f9fafb',
+							borderRadius: '0.5rem',
+							border: '1px solid #d1d5db',
+							outline: 'none',
+							transition: 'border-color 0.2s, box-shadow 0.2s',
+							resize: 'none',
+						},
+					},
+				},
+			],
 		});
 
-		return labeledInput;
+		textarea.on('render', () => {
+			textarea.element
+				.querySelector('textarea')
+				.addEventListener('input', (event: Event) => {
+					const target = event.target as HTMLInputElement;
+					this.set('metadata', target.value);
+				});
+		});
+
+		return textarea;
 	}
 }

@@ -7,10 +7,29 @@ import {
 	LocaleTranslate,
 } from 'ckeditor5';
 import { ParameterFormView } from './paremeter-form-view';
+import { LlmConnectorConfig } from './interfaces/llm-connector-config';
+import { Frequency } from './interfaces/frequency';
 
 export default class LlmConnectorParameterConfigUI extends Plugin {
+	public declare frequency: Frequency;
+	public declare metadata: string;
+	public declare accuracy: number;
+
+	private config: LlmConnectorConfig;
+
 	init(): void {
+		this._processConfig();
 		this._addParameterConfigButton();
+	}
+
+	private _processConfig(): void {
+		this.config = this.editor.config.get('llmConnector') || {};
+		this.set('accuracy', this.config?.initData?.accuracy || 80);
+		this.set(
+			'frequency',
+			this.config?.initData?.frequency || 'onWordComplete'
+		);
+		this.set('metadata', this.config?.initData?.metadata || '');
 	}
 
 	/**
@@ -84,7 +103,11 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 
 		buttonView.isOn = true;
 
-		const formView = new ParameterFormView(locale);
+		const formView = new ParameterFormView(locale, {
+			accuracy: this.accuracy,
+			frequency: this.frequency,
+			metadata: this.metadata,
+		});
 		const contentView = this._createDialogContentView(locale, formView);
 
 		dialog.show({
@@ -112,7 +135,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 			tag: 'div',
 			attributes: {
 				style: {
-					padding: 'var(--ck-spacing-large)',
+					padding: '0.5rem 1.6125rem 0.5rem 1rem',
 					whiteSpace: 'initial',
 					width: '100%',
 					maxWidth: '500px',
@@ -154,6 +177,12 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 				onExecute: () => {
 					const formData = formView.getData();
 					this.editor.fire('parameterConfig:submit', formData);
+					if (this.config.onParameterSubmit) {
+						this.config.onParameterSubmit(formData);
+					}
+					this.set('accuracy', formView.accuracy);
+					this.set('frequency', formView.frequency);
+					this.set('metadata', formView.metadata);
 					dialog.hide();
 				},
 			},
