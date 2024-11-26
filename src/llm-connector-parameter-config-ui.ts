@@ -12,7 +12,7 @@ import { Frequency } from './interfaces/frequency';
 
 export default class LlmConnectorParameterConfigUI extends Plugin {
 	public declare frequency: Frequency;
-	public declare metadata: string;
+	public declare model: string;
 	public declare accuracy: number;
 
 	private config: LlmConnectorConfig;
@@ -29,7 +29,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 			'frequency',
 			this.config?.initData?.frequency || 'onWordComplete'
 		);
-		this.set('metadata', this.config?.initData?.metadata || '');
+		this.set('model', this.config?.initData?.model || '');
 	}
 
 	/**
@@ -106,7 +106,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 		const formView = new ParameterFormView(locale, {
 			accuracy: this.accuracy,
 			frequency: this.frequency,
-			metadata: this.metadata,
+			model: this.model,
 		});
 		const contentView = this._createDialogContentView(locale, formView);
 
@@ -182,7 +182,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 					}
 					this.set('accuracy', formView.accuracy);
 					this.set('frequency', formView.frequency);
-					this.set('metadata', formView.metadata);
+					this.set('model', formView.model);
 					dialog.hide();
 				},
 			},

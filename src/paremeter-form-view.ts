@@ -16,9 +16,9 @@ export class ParameterFormView extends View {
 	keystrokes: KeystrokeHandler;
 	accuracySwitchView: View<HTMLElement>;
 	frequencyRadioGroupView: View<HTMLElement>;
-	metadataInputView: View<HTMLElement>;
+	modelInputView: View<HTMLElement>;
 	public declare frequency: Frequency;
-	public declare metadata: string;
+	public declare model: string;
 	public declare accuracy: number;
 
 	constructor(locale: Locale, formData: LlmConnectorData) {
@@ -32,7 +32,7 @@ export class ParameterFormView extends View {
 		// Initialize sub-views
 		this.accuracySwitchView = this.createAccuracySliderView();
 		this.frequencyRadioGroupView = this.createFrequencyRadioGroupView();
-		this.metadataInputView = this.createMetadataInputView();
+		this.modelInputView = this.createModelInputView();
 
 		// Set up template
 		this.setTemplate({
@@ -49,16 +49,16 @@ export class ParameterFormView extends View {
 			children: [
 				this.accuracySwitchView,
 				this.frequencyRadioGroupView,
-				this.metadataInputView,
+				this.modelInputView,
 			],
 		});
 	}
 
 	public getData(): LlmConnectorData {
-		const { frequency, metadata, accuracy } = this;
+		const { frequency, model, accuracy } = this;
 		return {
 			frequency,
-			metadata,
+			model,
 			accuracy,
 		};
 	}
@@ -66,7 +66,7 @@ export class ParameterFormView extends View {
 	private setDefaults(formData: LlmConnectorData): void {
 		this.set('accuracy', formData.accuracy);
 		this.set('frequency', formData.frequency);
-		this.set('metadata', formData.metadata);
+		this.set('model', formData.model);
 	}
 
 	render(): void {
@@ -78,7 +78,7 @@ export class ParameterFormView extends View {
 		// Add elements to focus tracker
 		this.addToFocusTracker(this.accuracySwitchView.element);
 		this.addToFocusTracker(this.frequencyRadioGroupView.element);
-		this.addToFocusTracker(this.metadataInputView.element);
+		this.addToFocusTracker(this.modelInputView.element);
 
 		this.keystrokes.listenTo(this.element);
 	}
@@ -96,7 +96,7 @@ export class ParameterFormView extends View {
 	}
 
 	focus(): void {
-		this.metadataInputView.element.querySelector('textarea').focus();
+		this.modelInputView.element.querySelector('textarea').focus();
 	}
 
 	// Create the accuracy slider view
@@ -263,8 +263,8 @@ export class ParameterFormView extends View {
 		return labelView;
 	}
 
-	// Create the metadata input view
-	private createMetadataInputView(): View<HTMLElement> {
+	// Create the model input view
+	private createModelInputView(): View<HTMLElement> {
 		const textarea = new View(this.locale);
 
 		const options = [
@@ -279,12 +279,12 @@ export class ParameterFormView extends View {
 			children: [
 				{
 					tag: 'label',
-					children: 'Metadata',
+					children: 'Model',
 				},
 				{
 					tag: 'textarea',
 					attributes: {
-						value: this.bindTemplate.to('metadata'),
+						value: this.bindTemplate.to('model'),
 						style: {
 							display: 'block',
 							padding: '10px',
@@ -308,7 +308,7 @@ export class ParameterFormView extends View {
 				.querySelector('textarea')
 				.addEventListener('input', (event: Event) => {
 					const target = event.target as HTMLInputElement;
-					this.set('metadata', target.value);
+					this.set('model', target.value);
 				});
 		});
 
