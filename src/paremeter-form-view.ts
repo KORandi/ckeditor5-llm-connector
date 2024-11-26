@@ -14,12 +14,12 @@ import { Frequency } from './interfaces/frequency';
 export class ParameterFormView extends View {
 	focusTracker: FocusTracker;
 	keystrokes: KeystrokeHandler;
-	accuracySwitchView: View<HTMLElement>;
+	temperatureSwitchView: View<HTMLElement>;
 	frequencyRadioGroupView: View<HTMLElement>;
 	modelInputView: View<HTMLElement>;
 	public declare frequency: Frequency;
 	public declare model: string;
-	public declare accuracy: number;
+	public declare temperature: number;
 
 	constructor(locale: Locale, formData: LlmConnectorData) {
 		super(locale);
@@ -30,7 +30,7 @@ export class ParameterFormView extends View {
 		this.setDefaults(formData);
 
 		// Initialize sub-views
-		this.accuracySwitchView = this.createAccuracySliderView();
+		this.temperatureSwitchView = this.createTemperatureSliderView();
 		this.frequencyRadioGroupView = this.createFrequencyRadioGroupView();
 		this.modelInputView = this.createModelInputView();
 
@@ -47,7 +47,7 @@ export class ParameterFormView extends View {
 				tabindex: '-1',
 			},
 			children: [
-				this.accuracySwitchView,
+				this.temperatureSwitchView,
 				this.frequencyRadioGroupView,
 				this.modelInputView,
 			],
@@ -55,16 +55,16 @@ export class ParameterFormView extends View {
 	}
 
 	public getData(): LlmConnectorData {
-		const { frequency, model, accuracy } = this;
+		const { frequency, model, temperature } = this;
 		return {
 			frequency,
 			model,
-			accuracy,
+			temperature,
 		};
 	}
 
 	private setDefaults(formData: LlmConnectorData): void {
-		this.set('accuracy', formData.accuracy);
+		this.set('temperature', formData.temperature);
 		this.set('frequency', formData.frequency);
 		this.set('model', formData.model);
 	}
@@ -76,7 +76,7 @@ export class ParameterFormView extends View {
 		submitHandler({ view: this });
 
 		// Add elements to focus tracker
-		this.addToFocusTracker(this.accuracySwitchView.element);
+		this.addToFocusTracker(this.temperatureSwitchView.element);
 		this.addToFocusTracker(this.frequencyRadioGroupView.element);
 		this.addToFocusTracker(this.modelInputView.element);
 
@@ -99,18 +99,17 @@ export class ParameterFormView extends View {
 		this.modelInputView.element.querySelector('textarea').focus();
 	}
 
-	// Create the accuracy slider view
-	private createAccuracySliderView(): View<HTMLElement> {
+	private createTemperatureSliderView(): View<HTMLElement> {
 		const container = new View(this.locale);
 
 		// Create slider input
 		const sliderInput = this.createSliderInput();
 
 		// Create label
-		const label = this.createLabel('Accuracy');
+		const label = this.createLabel('Temperature');
 
 		// Create display value
-		const displayValue = this.createAccuracyDisplayValue();
+		const displayValue = this.createTemperatureDisplayValue();
 
 		container.setTemplate({
 			tag: 'div',
@@ -150,7 +149,7 @@ export class ParameterFormView extends View {
 				max: '100',
 				step: '1',
 				class: 'ck-slider',
-				value: this.bindTemplate.to('accuracy'),
+				value: this.bindTemplate.to('temperature'),
 			},
 		});
 
@@ -158,14 +157,14 @@ export class ParameterFormView extends View {
 		slider.on('render', () => {
 			slider.element.addEventListener('input', (event: Event) => {
 				const target = event.target as HTMLInputElement;
-				this.set('accuracy', parseInt(target.value, 10));
+				this.set('temperature', parseInt(target.value, 10));
 			});
 		});
 
 		return slider;
 	}
 
-	private createAccuracyDisplayValue(): View<HTMLElement> {
+	private createTemperatureDisplayValue(): View<HTMLElement> {
 		const display = new View(this.locale);
 		display.setTemplate({
 			tag: 'span',
@@ -179,7 +178,7 @@ export class ParameterFormView extends View {
 			children: [
 				{
 					text: this.bindTemplate.to(
-						'accuracy',
+						'temperature',
 						(value: number) => `${value}%`
 					),
 				},

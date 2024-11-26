@@ -13,7 +13,7 @@ import { Frequency } from './interfaces/frequency';
 export default class LlmConnectorParameterConfigUI extends Plugin {
 	public declare frequency: Frequency;
 	public declare model: string;
-	public declare accuracy: number;
+	public declare temperature: number;
 
 	private config: LlmConnectorConfig;
 
@@ -24,7 +24,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 
 	private _processConfig(): void {
 		this.config = this.editor.config.get('llmConnector') || {};
-		this.set('accuracy', this.config?.initData?.accuracy || 80);
+		this.set('temperature', this.config?.initData?.temperature || 80);
 		this.set(
 			'frequency',
 			this.config?.initData?.frequency || 'onWordComplete'
@@ -104,7 +104,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 		buttonView.isOn = true;
 
 		const formView = new ParameterFormView(locale, {
-			accuracy: this.accuracy,
+			temperature: this.temperature,
 			frequency: this.frequency,
 			model: this.model,
 		});
@@ -180,7 +180,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 					if (this.config.onParameterSubmit) {
 						this.config.onParameterSubmit(formData);
 					}
-					this.set('accuracy', formView.accuracy);
+					this.set('temperature', formView.temperature);
 					this.set('frequency', formView.frequency);
 					this.set('model', formView.model);
 					dialog.hide();
