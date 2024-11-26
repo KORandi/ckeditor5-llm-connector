@@ -10,6 +10,7 @@ import {
 } from 'ckeditor5';
 import { LlmConnectorData } from './interfaces/llm-connector-data';
 import { Frequency } from './interfaces/frequency';
+import { Model } from './interfaces/model';
 
 export class ParameterFormView extends View {
 	focusTracker: FocusTracker;
@@ -18,7 +19,7 @@ export class ParameterFormView extends View {
 	frequencyRadioGroupView: View<HTMLElement>;
 	modelInputView: View<HTMLElement>;
 	public declare frequency: Frequency;
-	public declare model: string;
+	public declare model: Model;
 	public declare temperature: number;
 
 	constructor(locale: Locale, formData: LlmConnectorData) {
@@ -307,7 +308,7 @@ export class ParameterFormView extends View {
 				.querySelector('textarea')
 				.addEventListener('input', (event: Event) => {
 					const target = event.target as HTMLInputElement;
-					this.set('model', target.value);
+					// this.set('model', target.value);
 				});
 		});
 

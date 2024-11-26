@@ -9,10 +9,11 @@ import {
 import { ParameterFormView } from './paremeter-form-view';
 import { LlmConnectorConfig } from './interfaces/llm-connector-config';
 import { Frequency } from './interfaces/frequency';
+import { Model } from './interfaces/model';
 
 export default class LlmConnectorParameterConfigUI extends Plugin {
 	public declare frequency: Frequency;
-	public declare model: string;
+	public declare model: Model;
 	public declare temperature: number;
 
 	private config: LlmConnectorConfig;
@@ -29,7 +30,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 			'frequency',
 			this.config?.initData?.frequency || 'onWordComplete'
 		);
-		this.set('model', this.config?.initData?.model || '');
+		this.set('model', this.config?.initData?.model || 'gpt');
 	}
 
 	/**
