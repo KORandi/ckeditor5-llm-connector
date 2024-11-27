@@ -10,11 +10,14 @@ import { ParameterFormView } from './paremeter-form-view';
 import { LlmConnectorConfig } from './interfaces/llm-connector-config';
 import { Frequency } from './interfaces/frequency';
 import { Model } from './interfaces/model';
+import defaultIconSVG from '../theme/icons/filetype-ai.svg';
 
 export default class LlmConnectorParameterConfigUI extends Plugin {
 	public declare frequency: Frequency;
 	public declare model: Model;
 	public declare temperature: number;
+	public declare icon: string;
+	public declare label: string | null;
 
 	private config: LlmConnectorConfig;
 
@@ -31,6 +34,8 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 			this.config?.initData?.frequency || 'onWordComplete'
 		);
 		this.set('model', this.config?.initData?.model || 'gpt');
+		this.set('icon', this.config?.icon || null);
+		this.set('label', this.config?.label || 'Configure autcomplete');
 	}
 
 	/**
@@ -61,10 +66,10 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 		const buttonView = new ButtonView(locale);
 
 		buttonView.set({
-			label: t('Show a modal'),
+			label: this.label && t(this.label),
 			tooltip: true,
-			withText: true,
-			isOn: false, // Initialize button state
+			isOn: false,
+			icon: this.icon || defaultIconSVG,
 		});
 
 		return buttonView;
