@@ -1,16 +1,18 @@
 import {
 	View,
-	LabeledFieldView,
-	createLabeledInputText,
 	submitHandler,
 	FocusTracker,
 	KeystrokeHandler,
-	InputTextView,
 	Locale,
 } from 'ckeditor5';
 import { LlmConnectorData } from './interfaces/llm-connector-data';
 import { Frequency } from './interfaces/frequency';
 import { Model } from './interfaces/model';
+
+const MODEL_OPTIONS: Record<Model, [string, Model]> = {
+	gpt: ['OpenAI GPT-4o-mini', 'gpt'],
+	llama: ['LLaMa 3.2', 'llama'],
+};
 
 export class ParameterFormView extends View {
 	focusTracker: FocusTracker;
@@ -267,48 +269,63 @@ export class ParameterFormView extends View {
 	private createModelInputView(): View<HTMLElement> {
 		const textarea = new View(this.locale);
 
-		const options = [
-			'disabled',
-			'onKeyPress',
-			'onWordComplete',
-			'onSentenceComplete',
-		];
 		textarea.setTemplate({
 			tag: 'div',
-			attributes: { class: 'flex flex-col' },
+			attributes: {
+				style: {
+					display: 'flex',
+					flexDirection: 'column',
+					gap: '0.25rem',
+				},
+			},
 			children: [
 				{
 					tag: 'label',
+					attributes: {
+						for: 'model',
+					},
 					children: 'Model',
 				},
 				{
-					tag: 'textarea',
+					tag: 'select',
 					attributes: {
-						value: this.bindTemplate.to('model'),
+						name: 'model',
 						style: {
-							display: 'block',
-							padding: '10px',
 							width: '100%',
-							fontSize: '0.875rem',
-							color: '#1f2937',
-							backgroundColor: '#f9fafb',
-							borderRadius: '0.5rem',
-							border: '1px solid #d1d5db',
-							outline: 'none',
-							transition: 'border-color 0.2s, box-shadow 0.2s',
-							resize: 'none',
+							maxWidth: '300px',
+							padding: '6px 4px',
+							fontSize: '16px',
+							lineHeight: '1.5',
+							color: '#333',
+							backgroundColor: '#fff',
+							border: '1px solid #ccc',
+							borderRadius: '4px',
+							transition:
+								'border-color 0.3s ease, box-shadow 0.3s ease',
 						},
 					},
+					children: [
+						...Object.values(MODEL_OPTIONS).map(
+							([children, value]) => ({
+								tag: 'option',
+								attributes: {
+									value,
+									selected: value === this.model,
+								},
+								children,
+							})
+						),
+					],
 				},
 			],
 		});
 
 		textarea.on('render', () => {
 			textarea.element
-				.querySelector('textarea')
+				.querySelector('select')
 				.addEventListener('input', (event: Event) => {
 					const target = event.target as HTMLInputElement;
-					// this.set('model', target.value);
+					this.set('model', target.value as Model);
 				});
 		});
 
