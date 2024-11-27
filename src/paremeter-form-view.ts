@@ -174,7 +174,6 @@ export class ParameterFormView extends View {
 			attributes: {
 				style: {
 					marginLeft: '8px',
-					fontSize: '14px',
 					fontWeight: 'bold',
 				},
 			},
@@ -294,7 +293,6 @@ export class ParameterFormView extends View {
 							width: '100%',
 							maxWidth: '300px',
 							padding: '6px 4px',
-							fontSize: '16px',
 							lineHeight: '1.5',
 							color: '#333',
 							backgroundColor: '#fff',
