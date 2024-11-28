@@ -45,6 +45,7 @@ export class ParameterFormView extends View {
 					display: 'flex',
 					flexDirection: 'column',
 					gap: '16px',
+					minWidth: '230px',
 				},
 				class: ['ck', 'ck-parameter-form', 'ck-responsive-form'],
 				tabindex: '-1',
