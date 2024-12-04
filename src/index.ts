@@ -1,4 +1,4 @@
-import './augmentation';
+import './augmentation.js';
 
 export { default as LLMConnector } from './llm-conector';
 
