@@ -18,11 +18,13 @@ export class ParameterFormView extends View {
 	focusTracker: FocusTracker;
 	keystrokes: KeystrokeHandler;
 	temperatureSwitchView: View<HTMLElement>;
+	debounceView: View<HTMLElement>;
 	frequencyRadioGroupView: View<HTMLElement>;
 	modelInputView: View<HTMLElement>;
 	public declare frequency: Frequency;
 	public declare model: Model;
 	public declare temperature: number;
+	public declare debounce: number;
 
 	constructor(locale: Locale, formData: LlmConnectorData) {
 		super(locale);
@@ -36,6 +38,7 @@ export class ParameterFormView extends View {
 		this.temperatureSwitchView = this.createTemperatureSliderView();
 		this.frequencyRadioGroupView = this.createFrequencyRadioGroupView();
 		this.modelInputView = this.createModelInputView();
+		this.debounceView = this.createDebounceSliderView();
 
 		// Set up template
 		this.setTemplate({
@@ -54,16 +57,18 @@ export class ParameterFormView extends View {
 				this.temperatureSwitchView,
 				this.frequencyRadioGroupView,
 				this.modelInputView,
+				this.debounceView,
 			],
 		});
 	}
 
 	public getData(): LlmConnectorData {
-		const { frequency, model, temperature } = this;
+		const { frequency, model, temperature, debounce } = this;
 		return {
 			frequency,
 			model,
 			temperature,
+			debounce,
 		};
 	}
 
@@ -71,6 +76,7 @@ export class ParameterFormView extends View {
 		this.set('temperature', formData.temperature);
 		this.set('frequency', formData.frequency);
 		this.set('model', formData.model);
+		this.set('debounce', formData.debounce);
 	}
 
 	render(): void {
@@ -83,6 +89,7 @@ export class ParameterFormView extends View {
 		this.addToFocusTracker(this.temperatureSwitchView.element);
 		this.addToFocusTracker(this.frequencyRadioGroupView.element);
 		this.addToFocusTracker(this.modelInputView.element);
+		this.addToFocusTracker(this.debounceView.element);
 
 		this.keystrokes.listenTo(this.element);
 	}
@@ -107,7 +114,7 @@ export class ParameterFormView extends View {
 		const container = new View(this.locale);
 
 		// Create slider input
-		const sliderInput = this.createSliderInput();
+		const sliderInput = this.createTemperatureSliderInput();
 
 		// Create label
 		const label = this.createLabel('Temperature');
@@ -143,7 +150,47 @@ export class ParameterFormView extends View {
 		return container;
 	}
 
-	private createSliderInput(): View<HTMLElement> {
+	private createDebounceSliderView(): View<HTMLElement> {
+		const container = new View(this.locale);
+
+		// Create slider input
+		const sliderInput = this.createDebounceSliderInput();
+
+		// Create label
+		const label = this.createLabel('Debounce');
+
+		// Create display value
+		const displayValue = this.createDebounceDisplayValue();
+
+		container.setTemplate({
+			tag: 'div',
+			attributes: {
+				style: {
+					display: 'flex',
+					flexDirection: 'column',
+					padding: '0 10px',
+				},
+			},
+			children: [
+				label,
+				{
+					tag: 'div',
+					attributes: {
+						style: {
+							display: 'flex',
+							alignItems: 'center',
+							gap: '10px',
+						},
+					},
+					children: [sliderInput, displayValue],
+				},
+			],
+		});
+
+		return container;
+	}
+
+	private createTemperatureSliderInput(): View<HTMLElement> {
 		const slider = new View(this.locale);
 		slider.setTemplate({
 			tag: 'input',
@@ -168,6 +215,31 @@ export class ParameterFormView extends View {
 		return slider;
 	}
 
+	private createDebounceSliderInput(): View<HTMLElement> {
+		const slider = new View(this.locale);
+		slider.setTemplate({
+			tag: 'input',
+			attributes: {
+				type: 'range',
+				min: '100',
+				max: '1000',
+				step: '1',
+				class: 'ck-slider',
+				value: this.bindTemplate.to('debounce'),
+			},
+		});
+
+		// Update accuracy on input
+		slider.on('render', () => {
+			slider.element.addEventListener('input', (event: Event) => {
+				const target = event.target as HTMLInputElement;
+				this.set('debounce', parseInt(target.value, 10));
+			});
+		});
+
+		return slider;
+	}
+
 	private createTemperatureDisplayValue(): View<HTMLElement> {
 		const display = new View(this.locale);
 		display.setTemplate({
@@ -182,6 +254,29 @@ export class ParameterFormView extends View {
 				{
 					text: this.bindTemplate.to(
 						'temperature',
+						(value: number) => `${value}%`
+					),
+				},
+			],
+		});
+
+		return display;
+	}
+
+	private createDebounceDisplayValue(): View<HTMLElement> {
+		const display = new View(this.locale);
+		display.setTemplate({
+			tag: 'span',
+			attributes: {
+				style: {
+					marginLeft: '8px',
+					fontWeight: 'bold',
+				},
+			},
+			children: [
+				{
+					text: this.bindTemplate.to(
+						'debounce',
 						(value: number) => `${value}%`
 					),
 				},

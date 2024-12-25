@@ -18,6 +18,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 	public declare temperature: number;
 	public declare icon: string;
 	public declare label: string | null;
+	public declare debounce: number;
 
 	private config: LlmConnectorConfig;
 
@@ -36,6 +37,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 		this.set('model', this.config?.initData?.model || 'gpt');
 		this.set('icon', this.config?.icon || null);
 		this.set('label', this.config?.label || 'Configure autcomplete');
+		this.set('debounce', this.config?.initData?.debounce || 500);
 	}
 
 	/**
@@ -113,6 +115,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 			temperature: this.temperature,
 			frequency: this.frequency,
 			model: this.model,
+			debounce: this.debounce,
 		});
 		const contentView = this._createDialogContentView(locale, formView);
 

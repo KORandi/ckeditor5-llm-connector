@@ -5,4 +5,5 @@ export interface LlmConnectorData {
 	temperature: number;
 	frequency: Frequency;
 	model: Model;
+	debounce: number;
 }
