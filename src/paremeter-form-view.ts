@@ -48,7 +48,7 @@ export class ParameterFormView extends View {
 					display: 'flex',
 					flexDirection: 'column',
 					gap: '16px',
-					minWidth: '230px',
+					minWidth: '280px',
 				},
 				class: ['ck', 'ck-parameter-form', 'ck-responsive-form'],
 				tabindex: '-1',
@@ -277,7 +277,7 @@ export class ParameterFormView extends View {
 				{
 					text: this.bindTemplate.to(
 						'debounce',
-						(value: number) => `${value}%`
+						(value: number) => `${value} ms`
 					),
 				},
 			],
