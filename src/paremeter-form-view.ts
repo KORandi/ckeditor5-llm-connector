@@ -55,9 +55,9 @@ export class ParameterFormView extends View {
 			},
 			children: [
 				this.temperatureSwitchView,
+				this.debounceView,
 				this.frequencyRadioGroupView,
 				this.modelInputView,
-				this.debounceView,
 			],
 		});
 	}
@@ -168,7 +168,7 @@ export class ParameterFormView extends View {
 				style: {
 					display: 'flex',
 					flexDirection: 'column',
-					padding: '0',
+					padding: '0 2px',
 				},
 			},
 			children: [

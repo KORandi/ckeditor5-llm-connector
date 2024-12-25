@@ -192,6 +192,7 @@ export default class LlmConnectorParameterConfigUI extends Plugin {
 					this.set('temperature', formView.temperature);
 					this.set('frequency', formView.frequency);
 					this.set('model', formView.model);
+					this.set('debounce', formView.debounce);
 					dialog.hide();
 				},
 			},
