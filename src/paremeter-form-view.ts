@@ -168,7 +168,7 @@ export class ParameterFormView extends View {
 				style: {
 					display: 'flex',
 					flexDirection: 'column',
-					padding: '0 10px',
+					padding: '0',
 				},
 			},
 			children: [
